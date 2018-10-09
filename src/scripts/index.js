@@ -28,6 +28,16 @@ assignment operators
 
 operator precedence: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence
 
+this - similar in java, refers to the current object in member methods. to be used to refer object attributes and methods 
+within object. refers to window object if refered outside of object.
+
+functions -  'call' on object method changes the refernces of this in object to argument object
+'apply' on object method is similar to call, can pass arguments with an array.
+call and apply do not create copy of the functions, they set the context of existing function to new object
+'bind' creates a copy of the function and sets context for new function with new object.
+** best practice is default parames should be listed to the end than in first in function declarations.
+arrowfunctions : concise way for defining function with arrows. does not have own 'this' context. use context of parent.
+
 
 */
 
@@ -194,9 +204,9 @@ function functionFeatures()
     let app = (function(){
         let id = 12;
         console.log('in IIFE');
-        return {appid : id}; //closure
+        return {appid : id, name: "ABC"}; //closure
     })();
-    console.log(app); //prints return value from IIFE function.
+    console.log(app.appid, app.name); //prints return value from IIFE function.
 
     //closure with IIFE. closure (return values for IIFE) : retains a inner function or variable even after fucntion executes. 
     console.log('init IIFE');
@@ -205,7 +215,7 @@ function functionFeatures()
         let id = 12;
         let getId = function()
         {
-            console.log('in getID');
+            console.log('in getID',this.id);
             return id++;
         };
         
@@ -214,8 +224,74 @@ function functionFeatures()
     console.log('accessing closure');
     console.log(app2.getId()); //12
     console.log(app2.getId()); //13
+
+
+    //defaultParameters
+    let fndefaultparams = function(id, color='blue')
+    {
+        console.log(id + ": "+ color);
+    };
+    fndefaultparams(123); //123: blue
+    fndefaultparams(456,'yellow'); //456: yellow
+}
+/*
+call, apply and bind chnages the context for 'this' in object to new object.
+*/
+function testCallNApplyNBind()
+{
+    let o = { id: 123, 
+        getId : function()
+        {
+            
+            return this.id;
+        },
+        getIdWPrfx : function(prefix)
+        {
+            
+            return prefix + this.id;
+        }
+    };
+    let newO = { id: 456};
+    console.log(o.getId.call(newO));
+    console.log(o.getIdWPrfx.call(newO,'IDCALL: ')); //456 call chnages the refernces of this in object to argument object. can take argument as comma separated.
+    console.log(o.getIdWPrfx.apply(newO,['ID: '])); //apply is similar to call, can pass arguments with an array.
+    
+    let newFn = o.getId.bind(newO);  //'bind' creates a copy of the function and sets context for new function with new object.
+    let newFn2 = o.getIdWPrfx.bind(newO,['BIND-ID: ']); 
+    console.log(newFn());
+    console.log(newFn2());
+}
+
+/*
+arrowfunctions : concise way for defining function with arrows. does not have own 'this' context. use context of parent.
+*/
+function arrowFunctions()
+{
+    let getId = () => 123;
+    console.log(getId()); //123
+
+    let getId2 = _ => 456; 
+    console.log(getId2()); //456
+
+    let getId3 = prefix => prefix+456; 
+    console.log(getId3('ID: ')); //ID: 456
+
+    let getId4 = (prefix,suffix) => prefix+456+suffix; 
+    console.log(getId4('ID: ', '!!')); //ID: 456!!
+
+    let getId5 = (prefix,suffix) => {
+        console.log('executing arrow 5');
+        let m = prefix+456+suffix; 
+        return m; //when using with {}, return statement is required.
+    };
+    console.log(getId5('ID: ', '!!')); //ID: 456!!
+
+
 }
 restParamsNArrays();
 convertType();
 operators();
 functionFeatures();
+testCallNApplyNBind();
+arrowFunctions();
+
