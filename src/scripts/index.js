@@ -55,6 +55,16 @@ find - finds the first object in array which satisfies the condition.
 
 class - similar to java, supports inheritance.
 
+modules - class defined in its own js file and exported from the file to be available for program.
+then use import to import class and use in main program.
+
+
+BOM and DOM: Browser object Model and Document Object Model
+Window : global object in javascript, represents the browser,
+Timers : Async, event handling
+
+DOM: document object model
+methods and variables to access events, properties  and methods for document/HTML Body access and manipulation.
 */
 
 function restParamsNArrays()
@@ -408,17 +418,97 @@ function classTest()
     f1car.runCar(300);
 }
 
+function moduleTest()
+{
 
+    let f1car = new ModuleCar(345);
+    f1car.startCar(100);
+    f1car.runCar(300);
+ 
+
+}
+
+function testWindow()
+{
+     
+    //as the year is not scoepd with let or this, it is on global window scope.
+    //if we use the import module in our code, then the code becomes module and variable is not on window anymore, need to be declared with let or this. 
+    //but we access global window proprties such as innerwidth etc. in this case (module case).
+   // year = 1965; console.log(window.year); //to run this, comment the module import statement and moduletest method. 
+    console.log(window.innerWidth);//works even with import module statement
+}
+
+function testTimer()
+{
+    console.log('testing timer event');
+
+    let i = 0;
+    //setTimeout runs once after the interval mentioned and stops.
+    let timeoutId = setTimeout(function(){
+        console.log('timeout event');
+        clearTimeout(timeoutId); //does not affect run, only clears.
+    },1000);
+
+
+   console.log(timeoutId);
+ 
+   
+   //setInterval function executes multiple times till clearInterval called
+    let intervalId = setInterval(function()
+    {
+        console.log('interval event'+i);
+        i++;
+        if(i >= 5)
+        {
+            clearInterval(intervalId);
+        }
+    },1000);
+
+
+}
+
+function testLocation()
+{
+    console.log(location); //location is BOM object provides information about the page.
+    console.log(document.location); //same object is also associated with DOM object.
+}
+
+function testDom()
+{
+    let el = document.getElementById('p1');
+    let elnames = document.getElementsByName('p2');
+    let eltags = document.getElementsByTagName('p'); //tag for para is p
+    let elclass = document.getElementsByClassName('p2');
+    console.log(el,elnames,eltags,elclass);
+
+    el.textContent = 'New Contents..';
+    el.setAttribute('dummy',1234);
+    el.classList.add('pc1');
+    el.style.color = 'red';
+
+    console.log(el);
+}
+
+
+
+
+
+//curly braces required. import statement cant be in a function.
+import {ModuleCar} from '../models/ModuleCar.js'; 
+//testTimer2();
 restParamsNArrays();
 convertType();
 operators();
 functionFeatures();
 testCallNApplyNBind();
-arrowFunctions();
 
+arrowFunctions();
 constructorFunction();
 prototypeCheck();
-
 arrayFunctions();
-
 classTest();
+moduleTest();
+testWindow(); 
+testTimer();
+testLocation();
+testDom();
