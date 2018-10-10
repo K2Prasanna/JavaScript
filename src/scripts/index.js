@@ -38,6 +38,22 @@ call and apply do not create copy of the functions, they set the context of exis
 ** best practice is default parames should be listed to the end than in first in function declarations.
 arrowfunctions : concise way for defining function with arrows. does not have own 'this' context. use context of parent.
 
+constructors and prototype
+when creating a function in constructor, there will be many copies of function as it will be created for each object. 
+prototype solves the issue and creates only one method for all objects being created for an object type
+polyfill - protoype is the way to expand functionality of existing object types by adding functions dynamically to the type and calling them on all objects.
+
+JSON.parse  : converts string to javascript object or arrrys.
+JSON.Stringify : converts javascript object or arrays to string
+
+
+Array functions:
+forEach - easier way to iterate the arrays
+filter - filters the array for a condition and return new array of the result.
+every - every checks for a condition to be by all objects in the array. returns false even if one of them fails to meet.
+find - finds the first object in array which satisfies the condition.
+
+class - similar to java, supports inheritance.
 
 */
 
@@ -288,6 +304,111 @@ function arrowFunctions()
 
 
 }
+
+function constructorFunction()
+{
+    let car = new Car(890);
+    car.startCar();
+}
+
+function Car(id)
+{
+    this.carId = id;
+    this.startCar = function()
+    {
+        console.log('Starting car ' + this.carId); //this is must here. or else get error.
+    };
+}
+//when creating a function in constructor, there will be many copies of function as it will be created for each object. 
+//prototype solves the issue and creates only one method for all objects being created for an object type
+function prototypeCheck()
+{
+    let car = new protoCar(567);
+
+    protoCar.prototype.startCar = function()
+    {
+        console.log('starting proto '+ this.carId);
+    };
+
+    car.startCar();
+
+}
+
+function protoCar(id)
+{
+    this.carId = id;
+}
+
+function arrayFunctions()
+{
+    let cars = [ {id : 123, style: "compact"},{id : 234, style: "convertible"},{id : 311, style: "sedan"},{id : 245, style: "convertible"}];
+    
+    //forEach easier way to iterate the arrays
+    cars.forEach(car => console.log(car.id));
+    cars.forEach((car,index) => console.log(index,car.style));
+
+    //filters the array for a condition and return new array of the result.
+    let convertibles = cars.filter(car => car.style === 'convertible');
+    console.log(convertibles); //2 lelements for convertible.
+
+    //every checks for a condition to be by all objects in the array. returns false even if one of them fails to meet.
+    let result = cars.every(car => car.id > 100); //true
+    console.log('every ' + result);
+    result = cars.every(car => car.id > 200); //false
+    console.log('every2 ' + result);
+
+    //finds the first object in array which satisfies the condition.
+    let findCar = cars.find(car => car.id > 200); 
+    console.log(findCar); //one element for 234
+}
+
+class TestCar
+{
+    constructor(id)
+    {
+        this.carId = id;
+    }
+
+    startCar(suffix)
+    {
+        console.log('starting test car in class: '+ this.carId + suffix);
+    }
+}
+
+class F1TestCar extends TestCar
+{
+    constructor(id, speed)
+    {
+        super(id); // this is must to call constructor in super class
+        this.speed = speed;
+    }
+
+    runCar(speed)
+    {
+        console.log('Running car at ' + speed);
+    }
+
+    startCar(suffix)
+    {
+        super.startCar(suffix); //optional (calling method from super) for normal methods.
+        console.log('Reaching the initial speed ' + this.speed);
+    }
+}
+
+function classTest()
+{
+    let car = new TestCar(123);
+    car.startCar(' class');
+
+    car = new TestCar(453);;
+    car.startCar(' class2');
+
+    let f1car = new F1TestCar(345,100);
+    f1car.startCar(' F1');
+    f1car.runCar(300);
+}
+
+
 restParamsNArrays();
 convertType();
 operators();
@@ -295,3 +416,9 @@ functionFeatures();
 testCallNApplyNBind();
 arrowFunctions();
 
+constructorFunction();
+prototypeCheck();
+
+arrayFunctions();
+
+classTest();
