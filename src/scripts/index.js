@@ -82,6 +82,9 @@ for webpack
 dev runs : npm run dev
 prod: npm run build : minimises files, variables.
 
+objects:
+can add properties and functions to objects after object creation in java scripts.
+
 */
 
 function restParamsNArrays()
@@ -336,8 +339,15 @@ function constructorFunction()
 {
     let car = new Car(890);
     car.startCar();
-}
+    //dynamic property color and function run on car
+    car.color = 'blue';
+    car.run = function(){console.log('running')};
+    console.log(car.color);
+    console.log(car['color']); //same as car.color, bracket notation. can have props like ['Eye Color']. can get propery names from user dynamically.
+    car.run();
 
+}
+//this is consctrutor function when called with 'new'
 function Car(id)
 {
     this.carId = id;
@@ -358,6 +368,10 @@ function prototypeCheck()
     };
 
     car.startCar();
+
+    //create object using object.create()
+   // let car1 = Object.create(Object.prototype,{name: 'car1',color='blue'});
+   // console.log(car1);
 
 }
 
@@ -389,6 +403,7 @@ function arrayFunctions()
     console.log(findCar); //one element for 234
 }
 
+//Class is ES6 feature.
 class TestCar
 {
     constructor(id)
