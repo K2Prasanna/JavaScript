@@ -61,10 +61,27 @@ then use import to import class and use in main program.
 
 BOM and DOM: Browser object Model and Document Object Model
 Window : global object in javascript, represents the browser,
-Timers : Async, event handling
+Timers : Async, event handling.
+Promise is the way to handle reponses from sync opeartions. on return promise.then is called.
 
 DOM: document object model
 methods and variables to access events, properties  and methods for document/HTML Body access and manipulation.
+
+try, catch, finally - same as in java
+
+HTTP: Running with jquery is preferred than Xhr
+mockapi.io: site for mocking http endpoint with data.
+
+security: browsers show code, not safe, so shd not store sensitive info in the variables, shd not use global variable (on windows) - browser debugging watch show them.
+avoid using eval, (eval converts test into code and executes the same. dynamic scripts)
+for man in middle attack - use ssl and secured cookies.
+
+For XSS: CSP, CORS HTTP headers
+
+for webpack 
+dev runs : npm run dev
+prod: npm run build : minimises files, variables.
+
 */
 
 function restParamsNArrays()
@@ -489,10 +506,108 @@ function testDom()
     console.log(el);
 }
 
+class MyError extends Error //created custom error
+{
+    constructor(id)
+    {
+        super('Custom error ' + id);
+        this.id = id;
+    }
+}
+
+function testErrors()
+{
+    try
+    {
+
+        throw new MyError(20);
+    }
+    catch(myerror)
+    {
+        console.log(myerror);
+    }
+    finally{
+        console.log('In Finally');
+    }
+    console.log('success');
+}
 
 
+function testPromise() //promise is the way to handle reponses from sync opeartions. on return promise.then is called.
+{
+    let promise = new Promise(function(resolve, reject)
+    {
+        //setTimeout(resolve, 1000);
+        setTimeout(reject, 1000);
+    });
+    promise.then(
+        value => console.log('Promise Resolved'),
+        error => console.log('Promise Rejected')
+    );
+
+}
+
+function testHTTPXhr()
+{
+    let xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function()
+    {
+        if(this.readyState == 4 && this.status == 200) //succesful execution
+        {
+            console.log(this.responseText);
+        }
+    };
+
+    xmlhttp.open("GET","http://5bc01da859c0e1001337f252.mockapi.io/test/mydata/mydata",true);
+    xmlhttp.send();
+}
+ function testHTTPJQuery() //running with jquery is preferred than Xhr.
+ {
+    let promise = $.get("http://5bc01da859c0e1001337f252.mockapi.io/test/mydata/mydata");
+    promise.then(
+        data => console.log("Success",data),
+        error => console.log("Error",error)
+    );
+     
+    let user = {name: "Prasanna Kulkarni", avatar: "https://s3.amazonaws.com/uifaces/faces/twitter/lepetitogre/128.jpg", email: "dummy@mail.com"};
+    let postPromise = $.post("http://5bc01da859c0e1001337f252.mockapi.io/test/mydata/mydata",user);
+    postPromise.then(
+        data => console.log("Successfully added user",data),
+        error => console.log("Error while adding user",error)
+    ); 
+ }  
 
 
+ function testForm()
+ {
+     let el = document.getElementById("user-form");
+     el.addEventListener('submit',event => {
+         let user = el.elements['username'];
+         let email = el.elements['email'];
+         console.log(user.value,email.value);
+         if(user.value.length < 4)
+         {
+             let err = document.getElementById("user-error"); //el.elements does not work for spans.
+             err.textContent = 'Invalid User';
+             err.style.color = 'red';
+             user.style.borderColor = 'red';
+         } 
+         else{
+             let userObj = {
+                 name: user.value,
+                 email: email.value
+             };
+             let promise = $.post("http://5bc01da859c0e1001337f252.mockapi.io/test/mydata/mydata",userObj);
+             promise.then(
+                 data => console.log("Form data submitted successfully.",data),
+                 error => console.log("Error while submitting data",error)
+             );
+         }
+         event.preventDefault();
+     });
+
+ }
+import $ from 'jquery'; //$ is object in jquery, no need of {} for $. added jquery.
 //curly braces required. import statement cant be in a function.
 import {ModuleCar} from '../models/ModuleCar.js'; 
 //testTimer2();
@@ -512,3 +627,8 @@ testWindow();
 testTimer();
 testLocation();
 testDom();
+testErrors();
+testPromise();
+//testHTTPXhr(); uncomment the two methods to check the HTTP request methods.
+//testHTTPJQuery();
+testForm();
