@@ -53,7 +53,9 @@ filter - filters the array for a condition and return new array of the result.
 every - every checks for a condition to be by all objects in the array. returns false even if one of them fails to meet.
 find - finds the first object in array which satisfies the condition.
 
-class - similar to java, supports inheritance.
+class - similar to java, supports inheritance. only in strict mode 'use strict' in .js first line.
+classes are es 2015 feature. 
+babel converts it to prototype and constructor fucntions to make it compatible with older browser.
 
 modules - class defined in its own js file and exported from the file to be available for program.
 then use import to import class and use in main program.
@@ -341,7 +343,7 @@ function constructorFunction()
     car.startCar();
     //dynamic property color and function run on car
     car.color = 'blue';
-    car.run = function(){console.log('running')};
+    car.run = function(){console.log('running');};
     console.log(car.color);
     console.log(car['color']); //same as car.color, bracket notation. can have props like ['Eye Color']. can get propery names from user dynamically.
     car.run();
@@ -368,13 +370,52 @@ function prototypeCheck()
     };
 
     car.startCar();
+    let car2 = new protoCar(342);
+   console.log(car.__proto__); //for object instances, need to use __proto__ than prototype. same as protoCar.prototype. refers same prototype instance
+   car.__proto__.speed  = 60; //same as protoCar.prototype.speed = 60 //adds new property to prototype, so gets applied to all teh object insatces created using protoCar function.
+   protoCar.prototype.avarage = 75; //updates property for existing prototype instance and so all instances created till now and in future will have this property with value 75.
+    //if the property is not available on instance, then js cehcks teh proto instance for default value and returns.
+   console.log(car.speed, car.__proto__.speed, car.avarage, car.__proto__.avarage);//60 60 75 75
+   
+   //This set property on object instance and does not update prototype.
+   car.speed = 70; 
+   console.log(car.speed, car.__proto__.speed,car2.speed, car.avarage, car2.avarage); //70 60 60 75 75
 
-    //create object using object.create()
+   //This will create a new instance of ptotoype which will be attached to the new objects created hereafter, but does not affect instances created before this line.
+   protoCar.prototype = {avarage: 80};
+   let car3 = new protoCar(555);
+   console.log(car.__proto__.avarage,car.avarage, car2.__proto__.avarage,car2.avarage,car3.avarage, car3.__proto__.avarage); //75 75 75 75 80 80
+  console.log(protoCar.prototype);
+
+  car.__proto__ = protoCar.prototype;// this will update teh prototype reference for old object to new prototype
+  console.log(car.__proto__.avarage,car.avarage, car2.__proto__.avarage,car2.avarage,car3.avarage, car3.__proto__.avarage); //80 80 75 75 80 80
+
+  
+
+  //prototype chains: achieves inheritance. classes should be used for cleaner code. classes does not display __proto__ and __proto__.__proto__
+    protoCar2.prototype = Object.create(protoVehicle.prototype); //Object.create does not call the constructor method. it links the prototype instance of protovehicle with protoCar.
+    protoCar2.prototype.constructor = protoCar2; //this makes sure the type of cosntructor remains that of protoCar2
+
+    let car4 = new protoCar2(111);
+    console.log(car4); //protoCar2 {type: "Car", carId: 111}
+    console.log('Protos');
+    console.log(car4.__proto__,car4.__proto__.__proto__);//protoCar2 protoVehicle
+
+
+   //create object using object.create()
    // let car1 = Object.create(Object.prototype,{name: 'car1',color='blue'});
    // console.log(car1);
 
 }
-
+function protoCar2(id)
+{
+    protoVehicle.call(this,'Car');
+    this.carId = id;
+}
+function protoVehicle(type)
+{
+    this.type = type;
+}
 function protoCar(id)
 {
     this.carId = id;
@@ -401,6 +442,49 @@ function arrayFunctions()
     //finds the first object in array which satisfies the condition.
     let findCar = cars.find(car => car.id > 200); 
     console.log(findCar); //one element for 234
+
+   // Object properties descriptors
+    console.log(Object.getOwnPropertyDescriptor(findCar,'id'));
+  //  Object.defineProperty(findCar,'id',{writable : false}); //makes the proprty readonly if it is tring or number.
+  // findCar.id = '355'; //fails with Cannot assign to read only property 'id' of object '#<Object>'
+
+    findCar.id = {section : 1, sequence: 151}; //fails with Cannot assign to read only property 'id' of object '#<Object>' if id already read only.
+    Object.defineProperty(findCar,'id',{writable : false}); //for objects, it is not effective. need to also use Object.freeze to make object non-updateable.
+   // Object.freeze(findCar.id);
+    findCar.id.section = 2;
+    console.log(findCar.id);
+
+    //setting enumrable false prevents proprety to be looped over and apprearing in object keys. the proprty is skipped in json stringify.
+    Object.defineProperty(findCar,'id',{enumerable : false});
+    console.log(Object.keys(findCar)); //doea not list id
+    console.log(JSON.stringify(findCar)); //does not serialize id.
+    for(let propertyName in findCar) //does not enumerate.
+    {
+        console.log(propertyName, findCar[propertyName]);
+    }
+    console.log(findCar['id']);
+
+
+    //defining getter and setters for a property.
+    Object.defineProperty(findCar,'description',{
+        get: function()
+        {
+            return this.id.section+"#" + this.style;
+        },
+        set: function(value)
+        {
+            let description = value.split('#');
+            this.id.section = Number.parseInt(description[0]);
+            this.style = description[1];
+        }
+    });
+
+    console.log(findCar['description']);
+    findCar.description = '789#coupe';
+    console.log(findCar['id'],findCar['style']);
+
+    //changing configurable to false, cannot chnage the enumerable and confiruable property, cannot delete proprty, but can make it writable.
+   
 }
 
 //Class is ES6 feature.
